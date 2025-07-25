@@ -3,11 +3,12 @@ package com.example.service;
 import com.example.model.dto.RecordCreateRequest;
 import com.example.model.dto.RecordDto;
 import com.example.model.dto.RecordUpdateRequest;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface RecordService {
-    List<RecordDto> getAllRecords();
+    Page<RecordDto> getAllRecords(Pageable pageable);
+
     RecordDto getRecordByUuid(String uuid);
 
     RecordDto createRecord(RecordCreateRequest createRequest);

@@ -9,6 +9,8 @@ import com.example.model.entity.Record;
 import com.example.service.RecordService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,12 +26,10 @@ public class RecordServiceImpl implements RecordService {
     private final RecordRepository recordRepository;
     private final RecordMapper recordMapper;
 
-    @Override
-    public List<RecordDto> getAllRecords() {
-        return recordRepository.findAll()
-                .stream()
-                .map(recordMapper::toDto)
-                .toList();
+   @Override
+    public Page<RecordDto> getAllRecords(Pageable pageable) {
+        Page<Record> recordPage = recordRepository.findAll(pageable);
+        return recordPage.map(recordMapper::toDto);
     }
 
     @Override
