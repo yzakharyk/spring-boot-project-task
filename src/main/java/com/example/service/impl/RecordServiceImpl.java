@@ -11,9 +11,9 @@ import com.example.repository.specification.RecordSpecification;
 import com.example.service.RecordService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class RecordServiceImpl implements RecordService {
 
     @Override
     public Page<RecordDto> getAllRecords(Pageable pageable, RecordFilter recordFilter) {
+        log.info("Fetching all records with filter: {}", recordFilter);
         var specification = RecordSpecification.withFilters(recordFilter);
         Page<Record> recordPage = recordRepository.findAll(specification, pageable);
         return recordPage.map(recordMapper::toDto);
@@ -37,11 +39,13 @@ public class RecordServiceImpl implements RecordService {
 
     @Override
     public RecordDto getRecordByUuid(String uuid) {
+        log.info("Fetching record with UUID: {}", uuid);
         return recordMapper.toDto(findRecordByUuid(uuid));
     }
 
     @Override
     public RecordDto createRecord(RecordCreateRequest createRequest) {
+        log.info("Creating a new record with name: {}", createRequest.name());
         var record = new Record();
         record.setUuid(UUID.randomUUID().toString());
         record.setName(createRequest.name());
@@ -56,12 +60,14 @@ public class RecordServiceImpl implements RecordService {
 
     @Override
     public void deleteRecord(String uuid) {
+        log.info("Deleting record with UUID: {}", uuid);
         var record = findRecordByUuid(uuid);
         recordRepository.delete(record);
     }
 
     @Override
     public RecordDto updateRecordDetails(String uuid, RecordUpdateRequest updateRequest) {
+        log.info("Updating record with UUID: {}", uuid);
         var record = findRecordByUuid(uuid);
 
         if (updateRequest.name() != null) {
