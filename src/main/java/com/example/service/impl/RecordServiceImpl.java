@@ -34,7 +34,7 @@ public class RecordServiceImpl implements RecordService {
 
     @Override
     public Page<RecordDto> getAllRecords(Pageable pageable, RecordFilter recordFilter) {
-        log.info("Fetching all records with filter: {}", recordFilter);
+        log.info("Fetching all records with filter: {} and pageable: {}", recordFilter, pageable);
         var specification = RecordSpecification.withFilters(recordFilter);
         Page<Record> recordPage = recordRepository.findAll(specification, pageable);
         return recordPage.map(recordMapper::toDto);
