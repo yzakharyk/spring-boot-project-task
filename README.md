@@ -52,6 +52,37 @@ You can run the application either locally or using Docker Compose.
    docker-compose down
    ```
 
+## Basic Authentication
+
+The application uses Basic Authentication for securing its endpoints. Two default users are configured:
+
+- **Admin User**:
+  - Username: `admin`
+  - Password: `admin`
+  - Role: `ADMIN`
+
+- **Regular User**:
+  - Username: `user`
+  - Password: `user`
+  - Role: `USER`
+
+## Example: Accessing the `/records` Endpoint
+
+You can use `curl` to access the `/records` endpoint with Basic Authentication by providing the `Authorization` header.
+
+### Example Request
+
+1. Encode your credentials (`username:password`) in Base64 format. For example:
+   ```bash
+   echo -n "user:user" | base64
+   ```
+   This will output: `dXNlcjp1c2Vy`.
+
+2. Use the encoded credentials in the `Authorization` header:
+   ```bash
+   curl -H "Authorization: Basic dXNlcjp1c2Vy" "http://localhost:8080/records?page=0&size=10&sortBy=createdAt&sortDir=desc"
+   ```
+
 ## Swagger API Documentation
 
 The application includes Swagger for API documentation. Once the application is running, you can access the Swagger UI at:
