@@ -15,10 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -51,9 +54,9 @@ public class RecordServiceImpl implements RecordService {
         record.setName(createRequest.name());
         record.setStatus(Record.Status.ACTIVE);
         record.setCreatedAt(LocalDateTime.now());
-        record.setCreatedBy("admin");
+        record.setCreatedBy(getCurrentUsername());
         record.setUpdatedAt(LocalDateTime.now());
-        record.setUpdatedBy("admin");
+        record.setUpdatedBy(getCurrentUsername());
         var createdRecord = recordRepository.save(record);
         return recordMapper.toDto(createdRecord);
     }
@@ -78,7 +81,7 @@ public class RecordServiceImpl implements RecordService {
         }
 
         record.setUpdatedAt(LocalDateTime.now());
-        record.setUpdatedBy("admin");
+        record.setUpdatedBy(getCurrentUsername());
 
         var updatedRecord = recordRepository.save(record);
         return recordMapper.toDto(updatedRecord);
@@ -88,6 +91,12 @@ public class RecordServiceImpl implements RecordService {
         return recordRepository.findById(uuid)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Record not found with uuid: " + uuid));
+    }
+
+    private String getCurrentUsername() {
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .map(Principal::getName)
+                .orElseThrow(() -> new IllegalStateException("No authentication found"));
     }
 }
 

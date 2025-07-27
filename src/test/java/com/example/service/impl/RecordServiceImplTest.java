@@ -18,6 +18,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -42,6 +45,11 @@ class RecordServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn("testUser");
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
     }
 
     @Test
@@ -99,7 +107,7 @@ class RecordServiceImplTest {
         Record record = new Record();
         record.setUuid(UUID.randomUUID().toString());
         when(recordRepository.save(any(Record.class))).thenReturn(record);
-        when(recordMapper.toDto(any(Record.class))).thenReturn(new RecordDto(record.getUuid(), "Test", "ACTIVE", null, null, null, null));
+        when(recordMapper.toDto(any(Record.class))).thenReturn(new RecordDto(record.getUuid(), "Test", "ACTIVE", null, "testUser", null, "testUser"));
 
         // Act
         RecordDto result = recordService.createRecord(createRequest);
@@ -107,6 +115,7 @@ class RecordServiceImplTest {
         // Assert
         assertNotNull(result);
         assertEquals("Test", result.name());
+        assertEquals("testUser", result.createdBy());
         verify(recordRepository, times(1)).save(any(Record.class));
     }
 
@@ -144,7 +153,7 @@ class RecordServiceImplTest {
         record.setStatus(Record.Status.ACTIVE);
         when(recordRepository.findById("123")).thenReturn(Optional.of(record));
         when(recordRepository.save(any(Record.class))).thenReturn(record);
-        when(recordMapper.toDto(any(Record.class))).thenReturn(new RecordDto("123", "Updated Name", "INACTIVE", null, null, null, null));
+        when(recordMapper.toDto(any(Record.class))).thenReturn(new RecordDto("123", "Updated Name", "INACTIVE", null, null, null, "testUser"));
 
         // Act
         RecordDto result = recordService.updateRecordDetails("123", updateRequest);
@@ -153,6 +162,7 @@ class RecordServiceImplTest {
         assertNotNull(result);
         assertEquals("Updated Name", result.name());
         assertEquals("INACTIVE", result.status());
+        assertEquals("testUser", result.updatedBy());
         verify(recordRepository, times(1)).save(record);
     }
 }
