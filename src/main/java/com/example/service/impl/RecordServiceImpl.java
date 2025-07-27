@@ -1,22 +1,24 @@
 package com.example.service.impl;
 
+import com.example.model.dto.RecordFilter;
 import com.example.repository.RecordRepository;
 import com.example.mapper.RecordMapper;
 import com.example.model.dto.RecordCreateRequest;
 import com.example.model.dto.RecordDto;
 import com.example.model.dto.RecordUpdateRequest;
 import com.example.model.entity.Record;
+import com.example.repository.specification.RecordSpecification;
 import com.example.service.RecordService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,9 +28,10 @@ public class RecordServiceImpl implements RecordService {
     private final RecordRepository recordRepository;
     private final RecordMapper recordMapper;
 
-   @Override
-    public Page<RecordDto> getAllRecords(Pageable pageable) {
-        Page<Record> recordPage = recordRepository.findAll(pageable);
+    @Override
+    public Page<RecordDto> getAllRecords(Pageable pageable, RecordFilter recordFilter) {
+        var specification = RecordSpecification.withFilters(recordFilter);
+        Page<Record> recordPage = recordRepository.findAll(specification, pageable);
         return recordPage.map(recordMapper::toDto);
     }
 
@@ -65,12 +68,7 @@ public class RecordServiceImpl implements RecordService {
             record.setName(updateRequest.name());
         }
         if (updateRequest.status() != null) {
-            try {
-                Record.Status statusEnum = Record.Status.valueOf(updateRequest.status());
-                record.setStatus(statusEnum);
-            } catch (IllegalArgumentException e) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status value: " + updateRequest.status());
-            }
+            record.setStatus(updateRequest.status());
         }
 
         record.setUpdatedAt(LocalDateTime.now());

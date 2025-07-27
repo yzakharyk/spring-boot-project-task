@@ -1,6 +1,8 @@
 package com.example.model.dto;
 
+import com.example.model.entity.Record;
+
 public record RecordUpdateRequest(
         String name,
-        String status) {
+        Record.Status status) {
 }

@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.model.dto.RecordCreateRequest;
 import com.example.model.dto.RecordDto;
+import com.example.model.dto.RecordFilter;
 import com.example.model.dto.RecordUpdateRequest;
 import com.example.service.RecordService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,12 +32,13 @@ public class RecordController {
             @RequestParam(defaultValue = "0") @Parameter(description = "Page number, starting from 0") int page,
             @RequestParam(defaultValue = "10") @Parameter(description = "Number of records per page") int size,
             @RequestParam(defaultValue = "createdAt") @Parameter(description = "Field to sort by") String sortBy,
-            @RequestParam(defaultValue = "desc") @Parameter(description = "Sort direction (asc or desc)") String sortDir) {
+            @RequestParam(defaultValue = "desc") @Parameter(description = "Sort direction (asc or desc)") String sortDir,
+            @Parameter(description = "Filter criteria for records", allowEmptyValue = true) RecordFilter recordFilter) {
 
         validateSortProperty(sortBy);
         int pageSize = Math.min(size, MAX_PAGE_SIZE);
         var pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.fromString(sortDir), sortBy));
-        return recordService.getAllRecords(pageable);
+        return recordService.getAllRecords(pageable, recordFilter);
     }
 
     @GetMapping("/{uuid}")
