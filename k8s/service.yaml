@@ -18,10 +18,9 @@ metadata:
   name: demo-db-service
 spec:
   selector:
-    app: demo-app
+    app: demo-db
   ports:
     - protocol: TCP
       port: 5432
       targetPort: 5432
   type: ClusterIP
-

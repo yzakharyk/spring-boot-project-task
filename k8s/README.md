@@ -20,7 +20,7 @@ docker tag demo-app:latest <your-docker-registry>/demo-app:latest
 docker push <your-docker-registry>/demo-app:latest
 ```
 
-Update the image name in `deployment.yaml` if using a remote registry.
+Update the image name in `deployment-app.yaml` if using a remote registry.
 
 ## Create Database Secrets
 
@@ -39,7 +39,8 @@ kubectl apply -f k8s/db-secret.yaml
 ## Deploy to Kubernetes
 
 ```sh
-kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/deployment-db.yaml
+kubectl apply -f k8s/deployment-app.yaml
 kubectl apply -f k8s/service.yaml
 ```
 
@@ -57,4 +58,4 @@ Open `http://<your-node-ip>:<node-port>/swagger-ui/index.html` in your browser.
 
 - Database credentials and URL are managed via Kubernetes Secrets.
 - Database data is stored in an ephemeral volume (`emptyDir`). For production, use a PersistentVolumeClaim.
-- Adjust resource requests/limits in `deployment.yaml` as needed.
+- Adjust resource requests/limits in deployment files as needed.
