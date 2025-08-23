@@ -4,12 +4,12 @@ metadata:
   name: demo-app-service
 spec:
   selector:
-    app: demo-app
+    app: demo-app     # must match your Deployment labels
   ports:
     - protocol: TCP
       port: 8080
       targetPort: 8080
-  type: NodePort
+  type: ClusterIP
 
 ---
 apiVersion: v1

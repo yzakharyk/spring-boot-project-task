@@ -1,3 +1,6 @@
+server:
+  forward-headers-strategy: framework # for use behind ingress in k8s
+
 spring:
   application:
     name: demo
