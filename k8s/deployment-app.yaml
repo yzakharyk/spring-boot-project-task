@@ -41,4 +41,19 @@ spec:
             limits:
               memory: "1024Mi"
               cpu: "500m"
-
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10   # wait for app to start
+            periodSeconds: 10          # check frequently
+            timeoutSeconds: 5         # wait this long for a response
+            failureThreshold: 3       # fail after 3 consecutive failures
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30   # give app time to start fully
+            periodSeconds: 15          # check less frequently than readiness
+            timeoutSeconds: 5
+            failureThreshold: 3        # restart after 3 failed checks
